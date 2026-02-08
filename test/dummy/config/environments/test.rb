@@ -5,4 +5,5 @@ Rails.application.configure do
   config.action_dispatch.show_exceptions = :rescuable
   config.active_support.deprecation = :stderr
   config.active_support.disallowed_deprecations_treatment = :raise
+  config.action_controller.allow_forgery_protection = false
 end

@@ -18,3 +18,4 @@ end
 
 require_relative "fine_print/engine"
 require_relative "fine_print/signable"
+require_relative "fine_print/enforceable"
