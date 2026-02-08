@@ -1,35 +1,104 @@
 # FinePrint
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/fine_print`. To experiment with that code, run `bin/console` for an interactive prompt.
+Versioned legal document management for Rails. Track and enforce user acceptance of Terms of Service, Privacy Policy, and other legal agreements with versioned documents and audit trails.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add to your Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "fine_print", github: "tylercschneider/fineprint"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Then run:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+bundle install
+rails fine_print:install:migrations
+rails db:migrate
 ```
 
-## Usage
+## Setup
 
-TODO: Write usage instructions here
+### 1. Configure agreements
+
+Create `config/initializers/fine_print.rb`:
+
+```ruby
+FinePrint.configure do |config|
+  config.agreements = [
+    FinePrint::Agreement.new(
+      id: :terms_of_service,
+      title: "Terms Of Service",
+      version_column: :accepted_terms_of_service_version_id,
+      document_type: :terms_of_service,
+      prompt_when_updated: true
+    ),
+    FinePrint::Agreement.new(
+      id: :privacy_policy,
+      title: "Privacy Policy",
+      version_column: :accepted_privacy_policy_version_id,
+      document_type: :privacy_policy,
+      prompt_when_updated: true
+    )
+  ]
+end
+```
+
+### 2. Include concerns
+
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include FinePrint::Signable
+end
+
+# app/controllers/application_controller.rb
+class ApplicationController < ActionController::Base
+  include FinePrint::Enforceable
+end
+```
+
+### 3. Mount routes
+
+```ruby
+# config/routes.rb
+mount FinePrint::Engine, at: "/"
+```
+
+### 4. Seed initial documents
+
+```bash
+rails fine_print:seed
+```
+
+## Auth Configuration
+
+FinePrint defaults to Devise conventions. Override for other auth systems:
+
+```ruby
+FinePrint.configure do |config|
+  config.current_user_method = ->(c) { c.current_user }
+  config.signed_in_method = ->(c) { c.user_signed_in? }
+  config.auth_controller_method = ->(c) { c.devise_controller? }
+  config.sign_out_method = ->(c) { c.sign_out(c.current_user) }
+end
+```
+
+## Routes
+
+The engine provides:
+
+- `GET /agreements/:id` - Show agreement for acceptance
+- `PATCH /agreements/:id` - Accept agreement
+- `DELETE /agreements/:id` - Decline agreement (signs user out)
+- `GET /terms` - Public terms of service page
+- `GET /privacy` - Public privacy policy page
+- `GET /admin/documents` - Admin CRUD for managing document versions
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/fine_print.
+```bash
+bundle install
+bundle exec rake test
+```
