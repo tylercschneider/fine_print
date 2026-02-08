@@ -4,6 +4,9 @@ ENV["RAILS_ENV"] = "test"
 
 require_relative "dummy/config/environment"
 
+# Clear engine migration paths — we use schema.rb for the in-memory DB
+ActiveRecord::Migrator.migrations_paths = []
+
 require "rails/test_help"
 
 # In-memory SQLite needs schema loaded on each boot
