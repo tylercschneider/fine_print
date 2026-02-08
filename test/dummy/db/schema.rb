@@ -55,6 +55,7 @@ ActiveRecord::Schema[8.0].define(version: 1) do
   create_table :users do |t|
     t.string :name
     t.string :email
+    t.boolean :admin, default: false, null: false
     t.bigint :accepted_terms_of_service_version_id
     t.bigint :accepted_privacy_policy_version_id
 

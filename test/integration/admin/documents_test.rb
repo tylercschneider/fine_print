@@ -1,7 +1,34 @@
 require "test_helper"
 
 class FinePrint::Admin::DocumentsTest < ActionDispatch::IntegrationTest
+  setup do
+    @admin = User.create!(name: "Admin", email: "admin@test.com", admin: true)
+    @non_admin = User.create!(name: "User", email: "user@test.com", admin: false)
+  end
+
+  # Auth tests
+
+  test "unauthenticated user is redirected from admin" do
+    get fine_print.admin_documents_path
+    assert_response :redirect
+  end
+
+  test "non-admin user is redirected from admin" do
+    sign_in(@non_admin)
+    get fine_print.admin_documents_path
+    assert_response :redirect
+  end
+
+  test "admin user can access admin" do
+    sign_in(@admin)
+    get fine_print.admin_documents_path
+    assert_response :success
+  end
+
+  # CRUD tests (as admin)
+
   test "can view documents list" do
+    sign_in(@admin)
     version = FinePrint::Document.create!(
       document_type: "terms_of_service",
       version: "1.0",
@@ -15,6 +42,7 @@ class FinePrint::Admin::DocumentsTest < ActionDispatch::IntegrationTest
   end
 
   test "can create new document" do
+    sign_in(@admin)
     get fine_print.new_admin_document_path
     assert_response :success
 
@@ -33,6 +61,7 @@ class FinePrint::Admin::DocumentsTest < ActionDispatch::IntegrationTest
   end
 
   test "can publish a draft by setting effective_at" do
+    sign_in(@admin)
     version = FinePrint::Document.create!(
       document_type: "privacy_policy",
       version: "1.0",
@@ -52,6 +81,7 @@ class FinePrint::Admin::DocumentsTest < ActionDispatch::IntegrationTest
   end
 
   test "can delete a document" do
+    sign_in(@admin)
     version = FinePrint::Document.create!(
       document_type: "terms_of_service",
       version: "1.0",
