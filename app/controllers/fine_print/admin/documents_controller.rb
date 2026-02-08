@@ -3,6 +3,8 @@
 module FinePrint
   module Admin
     class DocumentsController < ::ApplicationController
+      skip_before_action :require_accepted_agreements!, raise: false
+      before_action :authenticate_admin!
       before_action :set_document, only: [:show, :edit, :update, :destroy]
 
       def index
@@ -44,6 +46,10 @@ module FinePrint
       end
 
       private
+
+      def authenticate_admin!
+        FinePrint.config.authenticate_admin!(self)
+      end
 
       def set_document
         @document = FinePrint::Document.find(params[:id])

@@ -7,6 +7,7 @@ module FinePrint
     attr_accessor :signed_in_method
     attr_accessor :auth_controller_method
     attr_accessor :sign_out_method
+    attr_accessor :admin_auth_method
 
     def initialize
       @agreements = []
@@ -21,11 +22,15 @@ module FinePrint
           c.sign_out(c.current_user)
         end
       }
+      @admin_auth_method = ->(c) {
+        c.redirect_to("/", alert: "Not authorized") unless signed_in?(c)
+      }
     end
 
     def current_user(controller) = current_user_method.call(controller)
     def signed_in?(controller) = signed_in_method.call(controller)
     def auth_controller?(controller) = auth_controller_method.call(controller)
     def sign_out(controller) = sign_out_method.call(controller)
+    def authenticate_admin!(controller) = admin_auth_method.call(controller)
   end
 end
