@@ -7,7 +7,7 @@ Versioned legal document management for Rails. Track and enforce user acceptance
 Add to your Gemfile:
 
 ```ruby
-gem "fine_print", github: "tylercschneider/fineprint"
+gem "fine_print"
 ```
 
 Then run:
