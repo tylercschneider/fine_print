@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Versioned legal document management for Rails"
   spec.description = "Track and enforce user acceptance of Terms of Service, Privacy Policy, and other legal agreements with versioned documents and audit trails."
   spec.homepage = "https://github.com/tylercschneider/fine_print"
+  spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
