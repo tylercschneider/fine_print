@@ -21,4 +21,9 @@ class FinePrint::InstallGeneratorTest < Rails::Generators::TestCase
     run_generator
     assert_file "config/routes.rb", /mount FinePrint::Engine, at: "\/legal"/
   end
+
+  test "copies initializer" do
+    run_generator
+    assert_file "config/initializers/fine_print.rb", /FinePrint\.configure/
+  end
 end

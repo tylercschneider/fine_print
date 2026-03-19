@@ -12,6 +12,10 @@ module FinePrint
       def mount_engine
         route 'mount FinePrint::Engine, at: "/legal"'
       end
+
+      def copy_initializer
+        template "initializer.rb", "config/initializers/fine_print.rb"
+      end
     end
   end
 end
