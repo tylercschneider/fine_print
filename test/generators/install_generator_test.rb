@@ -26,4 +26,9 @@ class FinePrint::InstallGeneratorTest < Rails::Generators::TestCase
     run_generator
     assert_file "config/initializers/fine_print.rb", /FinePrint\.configure/
   end
+
+  test "copies migrations" do
+    run_generator
+    assert_migration "db/migrate/create_fine_print_documents.rb"
+  end
 end
